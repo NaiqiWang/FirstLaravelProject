@@ -8,6 +8,8 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Article;
 use Carbon\Carbon;
+use App\Http\Requests\ArticleRequest;
+use Illuminate\Database\Eloquent\Model;
 
 class ArticleController extends Controller
 {
@@ -18,8 +20,18 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::all();
-        $articles = Article::all();
+    
+
+    	//Display all.
+//      $articles = Article::all();
+        
+    	//Don't display future ones.
+//      $articles = Article::latest('published_at')->where('published_at', '<=', Carbon::now())->get();
+        
+    	
+    	//utilize query scope defined in Article.php scopePublished
+    	$articles = Article::latest('published_at')->Published()->get();
+    	
         return view('articles.index', compact('articles'));
     }
 	
@@ -27,6 +39,7 @@ class ArticleController extends Controller
     {
     	$articles = Article::findOrFail($id);
     	
+//     	dd($articles->published_at);
     	
     	return view('articles.show', compact('articles'));
     }
@@ -36,12 +49,29 @@ class ArticleController extends Controller
     	return view('articles.create');
     }
     
-    public function store()
+    public function edit($id)
     {
-    	$input = Request::all();
-    	$input['published_at'] = Carbon::now();
+    	$article = Article::findOrFail($id);
+    	return view('articles.edit', compact('article'));
+    }
+    
+    public function update($id, ArticleRequest $request)
+    {
+    	$article = Article::findOrFail($id);
     	
-    	Article::create($input);
+    	$article->update($request->all());
+    	
+    	return view('articles.edit', compact('article'));
+    }
+    
+    public function store(ArticleRequest $request)
+    {
+    	//Automatic Validation because of App\Http\Requests\CreateArticleRequest
+
+    	$article = new Article($request->all());
+    	\Auth::user()->articles()->save($article);
+    	
+    	//Article::create($request->all());
     	
     	return redirect('articles');
     }

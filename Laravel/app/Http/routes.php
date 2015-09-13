@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Requests\Controllers\ArticleController;
+use App\Http\Controllers\Auth\AuthController;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -11,17 +13,26 @@
 |
 */
 
-Route::get('/', function () {
-//     return view('welcome');
+	Route::get('/', function () {
+	//     return view('welcome');
 	$posts = DB::table('student')->get();
 	dd($posts);
+	});
+
+    Route::get('contact', 'WelcomeController@contact');
+    Route::get('about', 'PageController@about');
+   
+   
+//  Route::get('articles', 'ArticleController@index');
+//  Route::get('articles/create', 'ArticleController@create');
+//  Route::get('articles/{id}', 'ArticleController@show');
+//  Route::post('articles', 'ArticleController@store');
+//  Route::get('articles/{id}/edit', 'ArticleController@edit');
+
+    Route::resource('articles', 'ArticleController');
+
+	Route::controllers([
+		'auth' => 'Auth\AuthController',
+		'password' => 'Auth\passwordController',
 	
-});
-
-Route::get('contact', 'WelcomeController@contact');
-Route::get('about', 'PageController@about');
-Route::get('articles', 'ArticleController@index');
-Route::get('articles/create', 'ArticleController@create');
-Route::get('articles/{id}', 'ArticleController@show');
-Route::post('articles', 'ArticleController@store');
-
+	]);
