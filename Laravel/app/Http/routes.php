@@ -15,10 +15,18 @@ use App\Http\Controllers\Auth\AuthController;
 
 	Route::get('/', function () {
 	//     return view('welcome');
-	$posts = DB::table('student')->get();
-	dd($posts);
+// 	$posts = DB::table('student')->get();
+// 	dd($posts);
+
+		return 'Home Page';
 	});
 
+//     Route::get('contact', ['middleware' => 'auth', 'uses' => 'WelcomeController@contact']);
+//  	Route::get('contact', ['middleware' => 'auth', function()
+//  			{
+//  				return 'this page will only show if the user is signed in';
+//  			}
+//  	]);  n    
     Route::get('contact', 'WelcomeController@contact');
     Route::get('about', 'PageController@about');
    
@@ -33,6 +41,6 @@ use App\Http\Controllers\Auth\AuthController;
 
 	Route::controllers([
 		'auth' => 'Auth\AuthController',
-		'password' => 'Auth\passwordController',
+		'password' => 'Auth\PasswordController',
 	
 	]);

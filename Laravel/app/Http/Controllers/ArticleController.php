@@ -7,12 +7,20 @@ use Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Article;
+use App\Tag;
 use Carbon\Carbon;
 use App\Http\Requests\ArticleRequest;
+use App\Http\Controllers\Auth;
 use Illuminate\Database\Eloquent\Model;
 
 class ArticleController extends Controller
 {
+	//middle register here or register in route
+	public function __construct()
+	{
+		$this->middleware('auth',['only' => 'create']);
+		//$this->middleware('auth',['except' => 'create']);
+	}
     /**
      * Display a listing of the resource.
      *
@@ -46,13 +54,17 @@ class ArticleController extends Controller
     
     public function create()
     {
-    	return view('articles.create');
+    	$tags = Tag::lists('name','id');
+    	
+    	return view('articles.create', compact('tags'));
     }
     
     public function edit($id)
     {
     	$article = Article::findOrFail($id);
-    	return view('articles.edit', compact('article'));
+    	$tags = Tag::lists('name','id');
+    	
+    	return view('articles.edit', compact('article','tags'));
     }
     
     public function update($id, ArticleRequest $request)
@@ -61,7 +73,9 @@ class ArticleController extends Controller
     	
     	$article->update($request->all());
     	
-    	return view('articles.edit', compact('article'));
+    	$article->tags()->sync($request->input('tag_list'));
+    	
+    	return redirect('articles');
     }
     
     public function store(ArticleRequest $request)
@@ -70,9 +84,16 @@ class ArticleController extends Controller
 
     	$article = new Article($request->all());
     	\Auth::user()->articles()->save($article);
-    	
     	//Article::create($request->all());
     	
+    	$tagIds = $request->input('tag_list');
+    	$article->tags()->attach($tagIds);
+    	
+    	
+    	
+    	\Session::flash('flash_message', 'Your article has been created!');
+    	\Session::flash('flash_message_important', true);
+    	 
     	return redirect('articles');
     }
 }
